@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Defense Commander</string>
+    <string name="base">base</string>
+    <string name="titleimage">titleImage</string>
+    <string name="score_0">Score: 0</string>
+    <string name="level_1">Level: 1</string>
+    <string name="gameover">gameOver</string>
+</resources>
