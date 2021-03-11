@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DefenseCommander">
-        <activity android:name=".LeaderboardActivity"></activity>
+        <activity android:name=".LeaderboardActivity">
+
+        </activity>
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".SplashActivity">
             <intent-filter>

@@ -16,7 +16,6 @@ public class MissileMaker implements Runnable {
     private static final int INTERCEPTOR_BLAST_RANGE = 120;
     private int level = 1;
     private long delay = 1000; // Pause between new planes
-    private MissileMaker missileMaker;
 
     MissileMaker(MainActivity mainActivity, int screenWidth, int screenHeight){
         this.mainActivity = mainActivity;

@@ -9,7 +9,6 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -34,16 +33,14 @@ public class MainActivity extends AppCompatActivity {
     private MissileMaker missileMaker;
     private TextView levelTextView, scoreTextView;
     private int scoreValue;
-    double launcher1X, launcher1Y, launcher2X, launcher2Y, launcher3X, launcher3Y;
-    private Point launcher1p, launcher2p, launcher3p;
-    private final ArrayList<Point> basePoints = new ArrayList<>();
     private static final int Base_BLAST_RANGE = 250;
-    public static int interceptorCount = 0;
     public ArrayList<ImageView> interceptorArrayList = new ArrayList<>();
     private ImageView gameOverImageView;
     private String leaderboardResults;
-    private String showLeaderboard = "showLeaderboard";
-    private String updateScore = "updateScore";
+    public static final String checkLeaderboard = "checkLeaderboard";
+    public static final String updateLeaderborad = "updateLeaderboard";
+    public static final String showLeaderboard = "showLeaderboard";
+    private String initials;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -74,22 +71,6 @@ public class MainActivity extends AppCompatActivity {
         levelTextView = findViewById(R.id.mainLevelTextView);
         scoreTextView = findViewById(R.id.mainScoreTextView);
         gameOverImageView = findViewById(R.id.mainGameOverImageView);
-
-//        launcher1X = launcher1.getX()+ ((0.5 * launcher1.getWidth()));
-//        launcher1Y = launcher1.getY() + ((0.5 * launcher1.getHeight()));
-//        launcher2X = launcher2.getX() + ((float) (0.5 * launcher2.getWidth()));
-//        launcher2Y = launcher2.getY() + ((float) (0.5 * launcher2.getHeight()));
-//        launcher3X = launcher3.getX() + ((float) (0.5 * launcher3.getWidth()));
-//        launcher3Y = launcher3.getY() + ((float) (0.5 * launcher3.getHeight()));
-//        launcher1p.x = (int) launcher1X;
-//        launcher1p.y = (int) launcher1Y;
-//        launcher2p.x = (int) launcher2X;
-//        launcher2p.y = (int) launcher2Y;
-//        launcher3p.x = (int) launcher3X;
-//        launcher3p.y = (int) launcher3Y;
-//        basePoints.add(launcher1p);
-//        basePoints.add(launcher2p);
-//        basePoints.add(launcher3p);
     }
 
     private void setUpFullScreen() {
@@ -174,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
             if(launcherList.size() == 0)
             {
                 gameOver();
+                SoundPlayer.getInstance().stop("background");
             }
         }
     }
@@ -188,20 +170,6 @@ public class MainActivity extends AppCompatActivity {
                 returnImageView = imageView;
             }
         }
-//        float distanceFromBase1 = distance(getStartX(launcher1), getStartY(launcher1), xLoc, yLoc);
-//        float distanceFromBase2 = distance(getStartX(launcher2), getStartY(launcher2), xLoc, yLoc);
-//        float distanceFromBase3 = distance(getStartX(launcher3), getStartY(launcher3), xLoc, yLoc);
-//
-//        float min = distanceFromBase1;
-//        ImageView returnImageView = launcher1;
-//        if(distanceFromBase2<min) {
-//            min = distanceFromBase2;
-//            returnImageView = launcher2;
-//        }
-//        if(distanceFromBase3<min) {
-//            min = distanceFromBase3;
-//            returnImageView = launcher3;
-//        }
         return returnImageView;
     }
 
@@ -223,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         objectAnimator.setDuration(3000);
         objectAnimator.start();
         gameOverImageView.setVisibility(View.VISIBLE);
-        ScoreDataBaseHandler scoreDataBaseHandler = new ScoreDataBaseHandler(this, "n/a", 0, 0, "compareScore");
+        ScoreDataBaseHandler scoreDataBaseHandler = new ScoreDataBaseHandler(this, "n/a", 0, 0, checkLeaderboard);
         new Thread(scoreDataBaseHandler).start();
     }
 
@@ -232,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         if(scoreValue>lowestScore){
             getInitials();
         }else{
-            openLeaderboardActivity(showLeaderboard);
+            makeSelection(showLeaderboard);
         }
     }
 
@@ -247,18 +215,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 TextView initialsTextView = view.findViewById(R.id.dialogInitialsTextView);
-                String initials = initialsTextView.getText().toString();
+                initials = initialsTextView.getText().toString();
                 if(initials.equals("") || initials.length()<3){
                     initialsError();
                 }else{
-                    openLeaderboardActivity(updateScore);
+                    makeSelection(updateLeaderborad);
                 }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                openLeaderboardActivity(showLeaderboard);
+                makeSelection(showLeaderboard);
             }
         });
     }
@@ -266,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
     private void initialsError(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Please Try Again");
-        builder.setMessage("Initials should be between 0 and 3 characters ");
+        builder.setMessage("Initials should be between 1 and 3 characters ");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -277,10 +245,24 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void openLeaderboardActivity(String status){
+    private void makeSelection(String status){
+        if(status.equals(updateLeaderborad)){
+            ScoreDataBaseHandler scoreDataBaseHandler = new ScoreDataBaseHandler(this, "n/a", 0, 0, updateLeaderborad);
+            new Thread(scoreDataBaseHandler).start();
+        }
+        else{
+            openLeaderBoardActivity();
+        }
+    }
+
+    public void setUpdatedLeaderborad(String s){
+        leaderboardResults = s;
+        openLeaderBoardActivity();
+    }
+
+    private void openLeaderBoardActivity(){
         Intent intent = new Intent(this, LeaderboardActivity.class);
         intent.putExtra("leaderboardList", leaderboardResults);
-        intent.putExtra("status", status);
         startActivity(intent);
     }
 }

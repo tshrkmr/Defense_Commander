@@ -105,9 +105,9 @@ public class Interceptor {
         mainActivity.applyInterceptorBlast(this);
     }
 
-    void launch() {
-        //animatorSet.start();
-    }
+//    void launch() {
+//        animatorSet.start();
+//    }
 
     float getX() {
         int xVar = imageview.getWidth() / 2;
